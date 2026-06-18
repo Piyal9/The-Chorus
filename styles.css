@@ -2385,3 +2385,19 @@ body {
 [data-theme="midnight-purple"] .support-card:hover {
     background: linear-gradient(135deg, #2D1B4E, #4A2C7A);
 }
+/* Styles the image itself */
+.logo-img {
+    width: 50px;          /* Sets a small, consistent width */
+    height: 50px;         /* Height must match width to stay a perfect circle */
+    border-radius: 50%;   /* Cuts the corners to make it round */
+    object-fit: cover;    /* Prevents the image from stretching or distorting */
+    display: block;       /* Enables proper margin centering */
+}
+
+/* Optional: Optional wrapper styling if you want it centered in the sidebar */
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
