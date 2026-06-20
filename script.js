@@ -8,6 +8,26 @@ let currentUser = {
 let notes = [];
 let announcements = [];
 
+// ============ SHARED CLOUD STORAGE (cross-device announcements) ============
+// Announcements are stored in a small free JSON storage box (jsonblob.com)
+// instead of localStorage, so a change made on one device shows up on every
+// other device/browser that opens the site. No account, login or server of
+// your own needed — just plain fetch() calls from this file. Worst case if
+// the storage ID ever leaks is someone edits the announcement text; it has
+// no access to your site's actual code or GitHub repo.
+//
+// ONE-TIME SETUP (skip this if ANNOUNCEMENTS_BLOB_ID below is already filled in):
+//   1. Open setup-storage.html (included alongside this file) in a browser.
+//   2. Click "Create Shared Storage" — it generates an ID for you.
+//   3. Paste that ID into ANNOUNCEMENTS_BLOB_ID below, replacing the
+//      placeholder text, then re-upload script.js to your host.
+//   Do this only once. Every device will then read/write the same box.
+const ANNOUNCEMENTS_BLOB_ID = 'PASTE_YOUR_BLOB_ID_HERE';
+const ANNOUNCEMENTS_API_URL = `https://jsonblob.com/api/jsonBlob/${ANNOUNCEMENTS_BLOB_ID}`;
+const MAX_ANNOUNCEMENTS = 10; // oldest one is dropped once this many are saved
+const ANNOUNCEMENTS_REFRESH_MS = 20000; // auto-check for changes from other devices
+const isAnnouncementsSetUp = ANNOUNCEMENTS_BLOB_ID && ANNOUNCEMENTS_BLOB_ID !== 'PASTE_YOUR_BLOB_ID_HERE';
+
 // ============ TOAST NOTIFICATION ============
 function showToast(message, type = 'info') {
     let toast = document.getElementById('toast');
@@ -138,24 +158,69 @@ function renderBandMembers() {
     `).join('');
 }
 
-function loadAnnouncements() {
-    const saved = localStorage.getItem('rehearsalAnnouncements');
-    if (saved) {
+async function loadAnnouncements(showLoadErrors = true) {
+    // Local cache loads first/instantly so the page never looks empty,
+    // then we try to refresh from shared storage so other devices' edits show up.
+    const cached = localStorage.getItem('rehearsalAnnouncementsCache');
+    if (cached) {
         try {
-            announcements = JSON.parse(saved);
+            announcements = JSON.parse(cached);
         } catch(e) {
             announcements = [...defaultAnnouncements];
-            saveAnnouncements();
         }
     } else {
         announcements = [...defaultAnnouncements];
-        saveAnnouncements();
     }
     renderAnnouncements();
+
+    if (!isAnnouncementsSetUp) {
+        console.warn('Shared announcement storage is not set up yet — see setup-storage.html. Showing locally cached announcements only.');
+        return;
+    }
+
+    try {
+        const res = await fetch(ANNOUNCEMENTS_API_URL, { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to load shared announcements');
+        const data = await res.json();
+        announcements = Array.isArray(data) ? data : (data.announcements || defaultAnnouncements);
+        localStorage.setItem('rehearsalAnnouncementsCache', JSON.stringify(announcements));
+        renderAnnouncements();
+    } catch (e) {
+        console.error('Could not reach shared storage, showing last known announcements.', e);
+        if (showLoadErrors) {
+            showToast('Could not refresh announcements (offline?) — showing last saved version', 'error');
+        }
+    }
 }
 
-function saveAnnouncements() {
-    localStorage.setItem('rehearsalAnnouncements', JSON.stringify(announcements));
+async function saveAnnouncements() {
+    // Keep only the most recent MAX_ANNOUNCEMENTS entries
+    if (announcements.length > MAX_ANNOUNCEMENTS) {
+        announcements = announcements
+            .slice()
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(announcements.length - MAX_ANNOUNCEMENTS);
+        renderAnnouncements();
+    }
+
+    localStorage.setItem('rehearsalAnnouncementsCache', JSON.stringify(announcements));
+
+    if (!isAnnouncementsSetUp) {
+        showToast('Shared storage not set up yet — saved on this device only. See setup-storage.html', 'error');
+        return;
+    }
+
+    try {
+        const res = await fetch(ANNOUNCEMENTS_API_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(announcements)
+        });
+        if (!res.ok) throw new Error('Failed to save to shared storage');
+    } catch (e) {
+        console.error('Could not save to shared storage — change is only on this device for now.', e);
+        showToast('Could not sync to other devices (offline?) — saved on this device only', 'error');
+    }
 }
 
 function escapeHtml(text) {
@@ -196,14 +261,14 @@ function renderAnnouncements() {
     `).join('');
 }
 
-function deleteAnnouncementById(id) {
+async function deleteAnnouncementById(id) {
     announcements = announcements.filter(a => a.id !== id);
-    saveAnnouncements();
     renderAnnouncements();
+    await saveAnnouncements();
     showToast('Announcement deleted successfully!', 'success');
 }
 
-function addNewAnnouncement(week, month, message) {
+async function addNewAnnouncement(week, month, message) {
     const newId = Date.now();
     announcements.push({
         id: newId,
@@ -212,9 +277,9 @@ function addNewAnnouncement(week, month, message) {
         message: message,
         date: new Date().toISOString()
     });
-    saveAnnouncements();
     renderAnnouncements();
-    showToast('Announcement added successfully!', 'success');
+    await saveAnnouncements();
+    showToast('Announcement added! It will appear on other devices shortly.', 'success');
 }
 
 function initAnnouncements() {
@@ -242,13 +307,18 @@ function initAnnouncements() {
     }
     
     if (saveAnnouncementBtn) {
-        saveAnnouncementBtn.onclick = function() {
+        const originalBtnText = saveAnnouncementBtn.textContent;
+        saveAnnouncementBtn.onclick = async function() {
             const week = document.getElementById('announcementWeek').value;
             const month = document.getElementById('announcementMonth').value;
             const message = document.getElementById('announcementMessage').value;
             
             if (week && month && message) {
-                addNewAnnouncement(week, month, message);
+                saveAnnouncementBtn.disabled = true;
+                saveAnnouncementBtn.textContent = 'Saving...';
+                await addNewAnnouncement(week, month, message);
+                saveAnnouncementBtn.disabled = false;
+                saveAnnouncementBtn.textContent = originalBtnText;
                 if (addAnnouncementModal) {
                     addAnnouncementModal.style.display = 'none';
                 }
@@ -266,6 +336,16 @@ function initAnnouncements() {
             addAnnouncementModal.style.display = 'none';
         }
     });
+
+    // Keep announcements in sync with other devices: poll periodically and
+    // refresh whenever the tab/app regains focus, so you don't need a hard
+    // reload to see changes made elsewhere.
+    if (isAnnouncementsSetUp) {
+        setInterval(() => loadAnnouncements(false), ANNOUNCEMENTS_REFRESH_MS);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') loadAnnouncements(false);
+        });
+    }
 }
 
 // ============ NOTES FUNCTIONALITY ============
