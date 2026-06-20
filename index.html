@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+    <!-- Try loading the image favicon first -->
+    <link rel="icon" type="image/png" href="index.png">
     <title>The Chorus | Official Website</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -26,8 +27,8 @@
                 <span>HOME</span>
             </a>
             <a href="#" class="nav-item" data-page="profile">
-                <i class="fas fa-user"></i>
-                <span>My Profile</span>
+                <i class="fas fa-users"></i>
+                <span>Profiles</span>
             </a>
             <a href="#" class="nav-item" data-page="uploads">
                 <i class="fas fa-upload"></i>
@@ -58,8 +59,8 @@
                 <a href="https://www.youtube.com/c/thechorus" target="_blank" class="social-icon youtube" title="YouTube">
                     <i class="fab fa-youtube"></i>
                 </a>
-                <a href="https://open.spotify.com/artist/thechorus" target="_blank" class="social-icon spotify" title="Spotify">
-                    <i class="fab fa-spotify"></i>
+                <a href="https://www.facebook.com/profile.php?id=61568279226917" target="_blank" class="social-icon spotify" title="Spotify">
+                    <i class="fab fa-facebook"></i>
                 </a>
             </div>
             
@@ -130,38 +131,34 @@
                 </div>
                 
                 <div class="user-menu" id="userMenu">
-                    <div class="user-avatar" id="userAvatar">TC</div>
+                    <div class="user-avatar" id="userAvatar">
+                        <img src="fav.png" alt="Profile">
+                    </div>
                     <div class="user-info">
                         <span class="user-name" id="userName">The Chorus</span>
-                        <span class="user-email" id="userEmail">fan@thechorus.com</span>
+                        <span class="user-email" id="userEmail">thechorusbandkolkata@gmail.com</span>
                     </div>
                     <i class="fas fa-chevron-down"></i>
                     
                     <!-- Dropdown Menu -->
                     <div class="dropdown-menu">
                         <div class="dropdown-header">
-                            <i class="fas fa-users"></i>
-                            <span>All Fans</span>
-                            <span class="account-count" id="accountCount">0</span>
+                            <i class="fas fa-user-circle"></i>
+                            <span>Account</span>
                         </div>
-                        <div class="dropdown-search">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="accountSearch" placeholder="Search fans...">
-                        </div>
-                        <div class="dropdown-accounts-list" id="accountsList">
-                            <div class="loading-accounts">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                Loading fans...
+                        <div class="account-item active">
+                            <div class="account-avatar">
+                              <img src="fav.png" alt="Profile" id="dropdownAvatar">
+                            </div>    
+                            <div class="account-info">
+                                <div class="account-name" id="dropdownName">The Chorus</div>
+                                <div class="account-email" id="dropdownEmail">thechorusbandkolkata@gmail.com</div>
                             </div>
-                        </div>
-                        <div class="dropdown-footer">
-                            <button id="viewAllUsersBtn" class="view-all-btn">
-                                <i class="fas fa-eye"></i> View All Fans
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- Page Content -->
@@ -183,11 +180,11 @@
                         <div class="feature-info">
                             <h3>Live Concert</h3>
                             <p class="event-title">Where Stars Shines</p>
-                            <p class="date"><i class="fas fa-calendar"></i> Updated during Shows</p>
+                            <p class="date"><i class="fas fa-calendar"></i>Book Shows</p>
                             <p class="location"><i class="fas fa-map-marker-alt"></i>India</p>
                         </div>
                         <button class="feature-btn" onclick="launchApp('concert')">
-                            <i class="fas fa-ticket-alt"></i> Book Tickets
+                            <i class="fas fa-ticket-alt"></i> Contact Us
                         </button>
                     </div>
 
@@ -228,36 +225,12 @@
             <!-- Profile Page -->
             <div id="profilePage" class="page">
                 <div class="welcome-section">
-                    <h1>My Profile</h1>
-                    <p>Manage your fan profile and preferences</p>
+                    <h1>Profiles</h1>
+                    <p>Meet the musicians of The Chorus</p>
                 </div>
-                
-                <div class="profile-container">
-                    <div class="profile-card">
-                        <div class="profile-header">
-                            <div class="profile-avatar" id="profileAvatar">TC</div>
-                            <h2 id="profileName">The Chorus</h2>
-                            <p id="profileRole">Music Lover</p>
-                        </div>
-                        <div class="profile-info">
-                            <div class="info-row">
-                                <label>Fan ID:</label>
-                                <span id="profileUserId">-</span>
-                            </div>
-                            <div class="info-row">
-                                <label>Email:</label>
-                                <span id="profileEmail">-</span>
-                            </div>
-                            <div class="info-row">
-                                <label>Mobile:</label>
-                                <span id="profileMobile">-</span>
-                            </div>
-                            <div class="info-row">
-                                <label>Member Since:</label>
-                                <span id="profileJoinDate">-</span>
-                            </div>
-                        </div>
-                    </div>
+
+                <div class="profiles-grid" id="profilesGrid">
+                    <!-- Musician cards will be loaded dynamically here -->
                 </div>
             </div>
 

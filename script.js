@@ -1,12 +1,10 @@
 // ============ GLOBAL VARIABLES ============
 let currentUser = {
     name: 'The Chorus',
-    email: 'fan@thechorus.com',
+    email: 'thechorusbandkolkata@gmail.com',
     user_id: 'TC001',
     mobile: '+91 9073556848'
 };
-let allAccounts = [];
-let filteredAccounts = [];
 let notes = [];
 let announcements = [];
 
@@ -93,6 +91,52 @@ const defaultAnnouncements = [
         date: new Date().toISOString()
     }
 ];
+
+// ============ BAND MUSICIAN PROFILES ============
+// Edit this list with the real band member names, roles and photo paths.
+// Drop photo files into an "assets/members/" folder and point "photo" at them
+// (e.g. 'assets/members/john.jpg'). If a photo is missing/broken, the card
+// automatically falls back to showing the member's initials.
+const bandMembers = [
+    { id: 1, name: 'PINKU DAS', role: 'Synth', photo: 'pinku.png' },
+    { id: 2, name: 'BIJAY', role: 'Lead Guitar', photo: 'bijay.png' },
+    { id: 3, name: 'NONE', role: 'Rhythm Guitar', photo: 'PZ.png' },
+    { id: 4, name: 'PIYAL', role: 'Bass', photo: 'piyal.png' },
+    { id: 5, name: 'ABIR', role: 'Drums', photo: 'abir.png' },
+    { id: 6, name: 'NONE', role: 'Lead Vocals', photo: 'fav.png' },
+    { id: 7, name: 'BISWANATH', role: 'Camera', photo: 'biswa.png' },
+    { id: 8, name: 'BABU', role: 'Percussion', photo: 'babu.png' }
+];
+
+function getInitials(name) {
+    return name
+        .split(' ')
+        .filter(Boolean)
+        .map(part => part[0])
+        .join('')
+        .substring(0, 2)
+        .toUpperCase();
+}
+
+function renderBandMembers() {
+    const grid = document.getElementById('profilesGrid');
+    if (!grid) return;
+
+    grid.innerHTML = bandMembers.map(member => `
+        <div class="musician-card">
+            <div class="musician-photo">
+                <img
+                    src="${escapeHtml(member.photo)}"
+                    alt="${escapeHtml(member.name)}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                >
+                <span class="photo-fallback" style="display:none;">${getInitials(member.name)}</span>
+            </div>
+            <span class="musician-role">${escapeHtml(member.role)}</span>
+            <h3 class="musician-name">${escapeHtml(member.name)}</h3>
+        </div>
+    `).join('');
+}
 
 function loadAnnouncements() {
     const saved = localStorage.getItem('rehearsalAnnouncements');
@@ -381,7 +425,7 @@ function initNotes() {
 // ============ UPDATE USER INTERFACE ============
 function updateUserInterface() {
     const userName = currentUser?.name || 'The Chorus';
-    const userEmail = currentUser?.email || 'fan@thechorus.com';
+    const userEmail = currentUser?.email || 'thechorusbandkolkata@gmail.com';
     const userId = currentUser?.user_id || 'TC001';
     const userAvatar = userName.substring(0, 2).toUpperCase();
     const userMobile = currentUser?.mobile || '+91 9073556848';
@@ -393,7 +437,9 @@ function updateUserInterface() {
     
     if (userNameEl) userNameEl.textContent = userName;
     if (userEmailEl) userEmailEl.textContent = userEmail;
-    if (userAvatarEl) userAvatarEl.textContent = userAvatar;
+    if (userAvatarEl && !userAvatarEl.querySelector('img')) {
+    userAvatarEl.textContent = userAvatar;
+    }
     if (welcomeNameEl) welcomeNameEl.textContent = userName.split(' ')[0];
     
     const profileNameEl = document.getElementById('profileName');
@@ -417,71 +463,25 @@ function updateUserInterface() {
     if (settingsName) settingsName.value = userName;
     if (settingsEmail) settingsEmail.value = userEmail;
     if (settingsMobile) settingsMobile.value = currentUser?.mobile || '';
+
+    renderAccountDropdown();
 }
 
-// ============ LOAD ALL ACCOUNTS (MOCK DATA) ============
-function loadAllAccounts() {
-    // Mock fan accounts for demonstration
-    allAccounts = [
-        { user_id: 'TC001', name: 'The Chorus', email: 'fan@thechorus.com', mobile: '+91 9073556848', super_user: 'Y', avatar: 'TC' },
-        { user_id: 'TC002', name: 'Rahul Sharma', email: 'rahul@email.com', mobile: '+91 9876543210', super_user: 'N', avatar: 'RS' },
-        { user_id: 'TC003', name: 'Priya Patel', email: 'priya@email.com', mobile: '+91 9876543211', super_user: 'N', avatar: 'PP' },
-        { user_id: 'TC004', name: 'Amit Kumar', email: 'amit@email.com', mobile: '+91 9876543212', super_user: 'N', avatar: 'AK' },
-        { user_id: 'TC005', name: 'Sneha Reddy', email: 'sneha@email.com', mobile: '+91 9876543213', super_user: 'N', avatar: 'SR' }
-    ];
-    filteredAccounts = [...allAccounts];
-    renderAccountsList(filteredAccounts);
-}
+// ============ SYNC SINGLE ACCOUNT INTO DROPDOWN ============
+// This site only ever has one account (The Chorus), so the dropdown just
+// mirrors the current account info instead of listing/searching multiple fans.
+function renderAccountDropdown() {
+    const userName = currentUser?.name || 'The Chorus';
+    const userEmail = currentUser?.email || 'thechorusbandkolkata@gmail.com';
+    const userAvatar = userName.substring(0, 2).toUpperCase();
 
-// ============ RENDER ACCOUNTS LIST ============
-function renderAccountsList(accounts) {
-    const container = document.getElementById('accountsList');
-    if (!container) return;
-    
-    const accountCount = document.getElementById('accountCount');
-    if (accountCount) accountCount.textContent = accounts.length;
-    
-    if (!accounts || accounts.length === 0) {
-        container.innerHTML = `
-            <div class="empty-accounts">
-                <i class="fas fa-user-slash"></i>
-                <p>No Account Found</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let html = '';
-    accounts.forEach(account => {
-        const isCurrentUser = currentUser && account.user_id === currentUser.user_id;
-        const badgeClass = account.super_user === 'Y' ? 'super' : '';
-        const badgeText = account.super_user === 'Y' ? 'Super' : 'User';
-        const avatar = account.avatar || (account.name || 'U').substring(0, 2).toUpperCase();
-        
-        html += `
-            <div class="account-item ${isCurrentUser ? 'active' : ''}" data-user-id="${account.user_id}">
-                <div class="account-avatar">${avatar}</div>
-                <div class="account-info">
-                    <div class="account-name">${account.name || 'User'}</div>
-                    <div class="account-email">${account.email || account.user_id}</div>
-                </div>
-                <div class="account-badge ${badgeClass}">${badgeText}</div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-    
-    document.querySelectorAll('.account-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const userId = item.getAttribute('data-user-id');
-            const account = allAccounts.find(a => a.user_id === userId);
-            if (account) {
-                showToast(`Viewing account: ${account.name}`, 'info');
-            }
-        });
-    });
+    const dropdownAvatarEl = document.getElementById('dropdownAvatar');
+    const dropdownNameEl = document.getElementById('dropdownName');
+    const dropdownEmailEl = document.getElementById('dropdownEmail');
+
+    if (dropdownAvatarEl) dropdownAvatarEl.textContent = userAvatar;
+    if (dropdownNameEl) dropdownNameEl.textContent = userName;
+    if (dropdownEmailEl) dropdownEmailEl.textContent = userEmail;
 }
 
 // ============ PAGE NAVIGATION ============
@@ -547,31 +547,6 @@ function initDropdown() {
             }
         }
     });
-    
-    const searchInput = document.getElementById('accountSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            if (!term.trim()) {
-                filteredAccounts = [...allAccounts];
-            } else {
-                filteredAccounts = allAccounts.filter(account => 
-                    (account.name?.toLowerCase().includes(term)) ||
-                    (account.email?.toLowerCase().includes(term)) ||
-                    (account.user_id?.toLowerCase().includes(term))
-                );
-            }
-            renderAccountsList(filteredAccounts);
-        });
-    }
-    
-    const viewAllBtn = document.getElementById('viewAllUsersBtn');
-    if (viewAllBtn) {
-        viewAllBtn.addEventListener('click', () => {
-            closeDropdown();
-            showToast('Showing all fans', 'info');
-        });
-    }
 }
 
 // ============ SETTINGS FORM ============
@@ -656,7 +631,7 @@ function launchApp(appName) {
         modalBody.innerHTML = '<div class="app-loader"><i class="fas fa-spinner fa-spin"></i><p>Redirecting to ticket booking page...</p></div>';
         modal.style.display = 'block';
         setTimeout(() => {
-            window.open('https://example.com/book-tickets', '_blank');
+            window.open('https://www.facebook.com/profile.php?id=61568279226917', '_blank');
             modal.style.display = 'none';
             showToast('Redirecting to ticket booking...', 'success');
         }, 1500);
@@ -686,8 +661,9 @@ function watchVideo(videoName) {
 
 // ============ LOGOUT ============
 function logout() {
-    localStorage.clear();
-    sessionStorage.clear();
+    // Note: we intentionally do NOT clear localStorage here.
+    // Announcements, notes and theme preference must survive logout/login
+    // and page refreshes, persisting until manually removed by the user.
     showToast('Logged out successfully!', 'success');
     setTimeout(() => {
         window.location.href = '/';
@@ -709,8 +685,8 @@ function initDashboard() {
     initThemeSwitcher();
     initNotes();
     initAnnouncements();
+    renderBandMembers();
     updateUserInterface();
-    loadAllAccounts();
     initNavigation();
     initSidebarToggle();
     initDropdown();
