@@ -100,12 +100,13 @@ const defaultAnnouncements = [
 const bandMembers = [
     { id: 1, name: 'PINKU DAS', role: 'Synth', photo: 'pinku.png' },
     { id: 2, name: 'BIJAY', role: 'Lead Guitar', photo: 'bijay.png' },
-    { id: 3, name: 'NONE', role: 'Rhythm Guitar', photo: 'PZ.png' },
+    { id: 3, name: 'NONE', role: 'Rhythm Guitar', photo: 'fav.png' },
     { id: 4, name: 'PIYAL', role: 'Bass', photo: 'piyal.png' },
     { id: 5, name: 'ABIR', role: 'Drums', photo: 'abir.png' },
     { id: 6, name: 'NONE', role: 'Lead Vocals', photo: 'fav.png' },
-    { id: 7, name: 'BISWANATH', role: 'Camera', photo: 'biswa.png' },
-    { id: 8, name: 'BABU', role: 'Percussion', photo: 'babu.png' }
+    { id: 7, name: 'SHAMBHU', role: 'Lead Vocals', photo: 'sambhu.png' },
+    { id: 8, name: 'BISWANATH', role: 'Camera', photo: 'biswa.png' },
+    { id: 9, name: 'BABU', role: 'Percussion', photo: 'babu.png' }
 ];
 
 function getInitials(name) {
