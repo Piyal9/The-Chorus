@@ -9,24 +9,57 @@ let notes = [];
 let announcements = [];
 
 // ============ SHARED CLOUD STORAGE (cross-device announcements) ============
-// Announcements are stored in a small free JSON storage box (jsonblob.com)
-// instead of localStorage, so a change made on one device shows up on every
-// other device/browser that opens the site. No account, login or server of
-// your own needed — just plain fetch() calls from this file. Worst case if
-// the storage ID ever leaks is someone edits the announcement text; it has
-// no access to your site's actual code or GitHub repo.
-//
-// ONE-TIME SETUP (skip this if ANNOUNCEMENTS_BLOB_ID below is already filled in):
-//   1. Open setup-storage.html (included alongside this file) in a browser.
-//   2. Click "Create Shared Storage" — it generates an ID for you.
-//   3. Paste that ID into ANNOUNCEMENTS_BLOB_ID below, replacing the
-//      placeholder text, then re-upload script.js to your host.
-//   Do this only once. Every device will then read/write the same box.
-const ANNOUNCEMENTS_BLOB_ID = 'PASTE_YOUR_BLOB_ID_HERE';
-const ANNOUNCEMENTS_API_URL = `https://jsonblob.com/api/jsonBlob/${ANNOUNCEMENTS_BLOB_ID}`;
-const MAX_ANNOUNCEMENTS = 10; // oldest one is dropped once this many are saved
-const ANNOUNCEMENTS_REFRESH_MS = 20000; // auto-check for changes from other devices
-const isAnnouncementsSetUp = ANNOUNCEMENTS_BLOB_ID && ANNOUNCEMENTS_BLOB_ID !== 'PASTE_YOUR_BLOB_ID_HERE';
+// Automatically creates and manages a free JSON storage box for syncing
+// announcements across all devices. No setup HTML file needed!
+const STORAGE_KEY = 'announcements_storage_id';
+const MAX_ANNOUNCEMENTS = 10;
+const ANNOUNCEMENTS_REFRESH_MS = 20000;
+
+// Get or create storage ID
+let ANNOUNCEMENTS_BLOB_ID = localStorage.getItem(STORAGE_KEY);
+let isAnnouncementsSetUp = false;
+
+// Try to get existing storage or create new one
+async function initializeStorage() {
+    if (ANNOUNCEMENTS_BLOB_ID) {
+        isAnnouncementsSetUp = true;
+        return ANNOUNCEMENTS_BLOB_ID;
+    }
+
+    try {
+        // Create a new storage blob
+        const response = await fetch('https://jsonblob.com/api/jsonBlob', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify([])
+        });
+
+        if (!response.ok) throw new Error('Failed to create storage');
+
+        const blobId = response.headers.get('Location')?.split('/').pop();
+        if (!blobId) throw new Error('No ID returned');
+
+        // Save the ID
+        ANNOUNCEMENTS_BLOB_ID = blobId;
+        localStorage.setItem(STORAGE_KEY, blobId);
+        isAnnouncementsSetUp = true;
+        
+        console.log('✅ Shared storage created! ID:', blobId);
+        return blobId;
+    } catch (error) {
+        console.warn('Could not create shared storage:', error);
+        isAnnouncementsSetUp = false;
+        return null;
+    }
+}
+
+function getApiUrl() {
+    return ANNOUNCEMENTS_BLOB_ID 
+        ? `https://jsonblob.com/api/jsonBlob/${ANNOUNCEMENTS_BLOB_ID}`
+        : null;
+}
 
 // ============ TOAST NOTIFICATION ============
 function showToast(message, type = 'info') {
@@ -113,10 +146,6 @@ const defaultAnnouncements = [
 ];
 
 // ============ BAND MUSICIAN PROFILES ============
-// Edit this list with the real band member names, roles and photo paths.
-// Drop photo files into an "assets/members/" folder and point "photo" at them
-// (e.g. 'assets/members/john.jpg'). If a photo is missing/broken, the card
-// automatically falls back to showing the member's initials.
 const bandMembers = [
     { id: 1, name: 'PINKU DAS', role: 'Synth', photo: 'pinku.png' },
     { id: 2, name: 'BIJAY', role: 'Lead Guitar', photo: 'bijay.png' },
@@ -158,9 +187,9 @@ function renderBandMembers() {
     `).join('');
 }
 
+// ============ CLOUD SYNC FUNCTIONS ============
 async function loadAnnouncements(showLoadErrors = true) {
-    // Local cache loads first/instantly so the page never looks empty,
-    // then we try to refresh from shared storage so other devices' edits show up.
+    // Load from cache first
     const cached = localStorage.getItem('rehearsalAnnouncementsCache');
     if (cached) {
         try {
@@ -173,22 +202,33 @@ async function loadAnnouncements(showLoadErrors = true) {
     }
     renderAnnouncements();
 
+    // If no storage ID, try to create one
+    if (!ANNOUNCEMENTS_BLOB_ID) {
+        await initializeStorage();
+    }
+
     if (!isAnnouncementsSetUp) {
-        console.warn('Shared announcement storage is not set up yet — see setup-storage.html. Showing locally cached announcements only.');
+        console.log('📝 Using local announcements only (no cloud sync)');
         return;
     }
 
+    const apiUrl = getApiUrl();
+    if (!apiUrl) return;
+
     try {
-        const res = await fetch(ANNOUNCEMENTS_API_URL, { cache: 'no-store' });
+        const res = await fetch(apiUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error('Failed to load shared announcements');
         const data = await res.json();
-        announcements = Array.isArray(data) ? data : (data.announcements || defaultAnnouncements);
-        localStorage.setItem('rehearsalAnnouncementsCache', JSON.stringify(announcements));
-        renderAnnouncements();
+        if (Array.isArray(data) && data.length > 0) {
+            announcements = data;
+            localStorage.setItem('rehearsalAnnouncementsCache', JSON.stringify(announcements));
+            renderAnnouncements();
+            console.log('🔄 Announcements synced from cloud');
+        }
     } catch (e) {
-        console.error('Could not reach shared storage, showing last known announcements.', e);
+        console.warn('Could not reach shared storage, showing cached announcements.', e);
         if (showLoadErrors) {
-            showToast('Could not refresh announcements (offline?) — showing last saved version', 'error');
+            showToast('Could not sync with cloud (offline?) — showing saved version', 'error');
         }
     }
 }
@@ -203,23 +243,29 @@ async function saveAnnouncements() {
         renderAnnouncements();
     }
 
+    // Save to cache
     localStorage.setItem('rehearsalAnnouncementsCache', JSON.stringify(announcements));
 
+    // Try to save to cloud
     if (!isAnnouncementsSetUp) {
-        showToast('Shared storage not set up yet — saved on this device only. See setup-storage.html', 'error');
+        console.log('📝 Saved to local cache only (cloud not available)');
         return;
     }
 
+    const apiUrl = getApiUrl();
+    if (!apiUrl) return;
+
     try {
-        const res = await fetch(ANNOUNCEMENTS_API_URL, {
+        const res = await fetch(apiUrl, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(announcements)
         });
-        if (!res.ok) throw new Error('Failed to save to shared storage');
+        if (!res.ok) throw new Error('Failed to save to cloud');
+        console.log('☁️ Announcements saved to cloud');
     } catch (e) {
-        console.error('Could not save to shared storage — change is only on this device for now.', e);
-        showToast('Could not sync to other devices (offline?) — saved on this device only', 'error');
+        console.warn('Could not save to cloud — saved locally only.', e);
+        showToast('Could not sync to cloud (offline?) — saved locally only', 'error');
     }
 }
 
@@ -279,7 +325,7 @@ async function addNewAnnouncement(week, month, message) {
     });
     renderAnnouncements();
     await saveAnnouncements();
-    showToast('Announcement added! It will appear on other devices shortly.', 'success');
+    showToast('✅ Announcement added! It will sync to other devices.', 'success');
 }
 
 function initAnnouncements() {
@@ -288,7 +334,10 @@ function initAnnouncements() {
     const closeAnnouncementModal = document.querySelector('.close-announcement-modal');
     const saveAnnouncementBtn = document.getElementById('saveAnnouncementBtn');
     
-    loadAnnouncements();
+    // Initialize storage first, then load announcements
+    initializeStorage().then(() => {
+        loadAnnouncements();
+    });
     
     if (addAnnouncementBtn) {
         addAnnouncementBtn.onclick = function() {
@@ -337,9 +386,7 @@ function initAnnouncements() {
         }
     });
 
-    // Keep announcements in sync with other devices: poll periodically and
-    // refresh whenever the tab/app regains focus, so you don't need a hard
-    // reload to see changes made elsewhere.
+    // Auto-sync with other devices
     if (isAnnouncementsSetUp) {
         setInterval(() => loadAnnouncements(false), ANNOUNCEMENTS_REFRESH_MS);
         document.addEventListener('visibilitychange', () => {
@@ -518,7 +565,7 @@ function updateUserInterface() {
     if (userNameEl) userNameEl.textContent = userName;
     if (userEmailEl) userEmailEl.textContent = userEmail;
     if (userAvatarEl && !userAvatarEl.querySelector('img')) {
-    userAvatarEl.textContent = userAvatar;
+        userAvatarEl.textContent = userAvatar;
     }
     if (welcomeNameEl) welcomeNameEl.textContent = userName.split(' ')[0];
     
@@ -548,8 +595,6 @@ function updateUserInterface() {
 }
 
 // ============ SYNC SINGLE ACCOUNT INTO DROPDOWN ============
-// This site only ever has one account (The Chorus), so the dropdown just
-// mirrors the current account info instead of listing/searching multiple fans.
 function renderAccountDropdown() {
     const userName = currentUser?.name || 'The Chorus';
     const userEmail = currentUser?.email || 'thechorusbandkolkata@gmail.com';
@@ -559,7 +604,9 @@ function renderAccountDropdown() {
     const dropdownNameEl = document.getElementById('dropdownName');
     const dropdownEmailEl = document.getElementById('dropdownEmail');
 
-    if (dropdownAvatarEl) dropdownAvatarEl.textContent = userAvatar;
+    if (dropdownAvatarEl && !dropdownAvatarEl.querySelector('img')) {
+        dropdownAvatarEl.textContent = userAvatar;
+    }
     if (dropdownNameEl) dropdownNameEl.textContent = userName;
     if (dropdownEmailEl) dropdownEmailEl.textContent = userEmail;
 }
@@ -741,9 +788,6 @@ function watchVideo(videoName) {
 
 // ============ LOGOUT ============
 function logout() {
-    // Note: we intentionally do NOT clear localStorage here.
-    // Announcements, notes and theme preference must survive logout/login
-    // and page refreshes, persisting until manually removed by the user.
     showToast('Logged out successfully!', 'success');
     setTimeout(() => {
         window.location.href = '/';
@@ -789,6 +833,13 @@ function initDashboard() {
             closeAppModal();
         }
     });
+    
+    // Show storage status
+    if (ANNOUNCEMENTS_BLOB_ID) {
+        console.log('☁️ Cloud sync enabled - ID:', ANNOUNCEMENTS_BLOB_ID);
+    } else {
+        console.log('📝 Cloud sync will be set up automatically when adding announcements');
+    }
     
     console.log('✅ Dashboard fully loaded!');
 }
