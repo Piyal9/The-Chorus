@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f3f0e8" />
+    <meta
+      name="description"
+      content="The Chorus — "
+    />
+    <title>The Chorus | Official Website</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" id="siteHeader">
+      <a class="brand" href="#top" aria-label="The Chorus home">
+        <span class="brand-mark"
+          ><img src="index.png" alt="The Chorus logo"
+        /></span>
+        <span class="brand-name">The Chorus</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#manifesto">Manifesto</a>
+        <a href="#members">The band</a>
+        <a href="#recordings">Recordings</a>
+      </nav>
+      <a class="header-cta" href="mailto:thechorusbandkolkata@gmail.com"
+        >Book the band <span>↗</span></a
+      >
+    </header>
+
+    <main id="top">
+      <section class="hero-scene" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="eyebrow-dot"></span> The Chorus |  Kolkata · India
+          </p>
+          <h1 id="hero-title">
+            Where Music Lives<br />
+          </h1>
+          <p class="hero-lede">
+            A five-piece collective making songs for the space between the last
+            light and the first note.
+          </p>
+          <div class="hero-actions">
+            <a class="button button--light" href="#recordings"
+              >Explore recordings <span>↗</span></a
+            >
+            <a
+              class="button button--outline"
+              href="mailto:thechorusbandkolkata@gmail.com?subject=Live%20session%20enquiry"
+              >Book a live session <span>↗</span></a
+            >
+          </div>
+        </div>
+        <div class="hero-caption">
+          A Music Session by The Chorus <span></span> Vol. 01
+        </div>
+      </section>
+
+      <section class="announcement-section section-paper" id="announcements">
+        <div class="section-index">01 / 05</div>
+        <div class="announcement-header">
+          <div>
+            <p class="kicker">Stay in the room</p>
+            <h2>Announcements.<br /></h2>
+          </div>
+          <button
+            class="announcement-add-button"
+            id="addAnnouncementBtn"
+            type="button"
+          >
+            <i class="fas fa-plus"></i> Add announcement
+          </button>
+        </div>
+        <div class="announcements-container" id="announcementsContainer">
+          <div class="empty-announcements">
+            <i class="fas fa-calendar-alt"></i>
+            <p>Loading rehearsal announcements...</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="manifesto section-dark" id="manifesto">
+        <div class="section-index">01 / 04</div>
+        <div class="manifesto-grid">
+          <div class="manifesto-side">
+            <p class="kicker">Our frequency</p>
+            <!-- IMAGE SLOT: put your picture next to index.html and add
+                 src="your-image.jpg" to the <img> below. Until then nothing shows. -->
+            <figure class="manifesto-media">
+              <img
+                alt="The Chorus"
+                loading="lazy"
+                onerror="this.closest('.manifesto-media').hidden = true"
+              />
+            </figure>
+          </div>
+          <div>
+            <h2>Every lyric tells a story,<br /><em>Every chord shares a soul.</em></h2>
+            <p class="section-copy">
+              The Chorus is an Independent Music Group built around live
+              energy, honest writing, and the beautiful friction of Seven
+              different points of view. We make records that leave a mark after
+              the room goes quiet.
+            </p>
+            <a class="text-link text-link--gold" href="#members"
+              >Meet the people <span>↗</span></a
+            >
+          </div>
+        </div>
+        <div class="manifesto-word" aria-hidden="true">LISTEN</div>
+      </section>
+
+      <section class="members section-paper" id="members">
+        <div class="section-index">02 / 04</div>
+        <div class="section-heading">
+          <div>
+            <p class="kicker">The people behind the pulse</p>
+            <h2>The<br /><em>Master Minds.</em></h2>
+          </div>
+          <p class="heading-note">
+            Every part has a point of view.<br />Every point of view makes the changes
+            better.
+          </p>
+        </div>
+        <div class="members-grid" id="profilesGrid"></div>
+      </section>
+
+      <section class="listening-room section-dark" id="recordings">
+        <div class="section-index">03 / 04</div>
+        <div class="section-heading section-heading--light">
+          <div>
+            <p class="kicker">The archive</p>
+            <h2>Recordings.<br /><em>Press play.</em></h2>
+          </div>
+          <p class="heading-note">
+            Video, live sessions, and<br />fragments from the room.
+          </p>
+        </div>
+        <div class="listening-grid">
+          <!-- Replace each empty href with your own video URL. -->
+          <a
+            class="release-card release-card--large"
+            href="https://www.facebook.com/reel/2003924950335430"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="release-art release-art--red"
+              ><i class="fas fa-play"></i></span
+            ><span class="release-meta">Band Intro</span
+            ><strong>Stage Intro</strong><small>Official music video</small
+            ><span class="card-arrow">↗</span>
+          </a>
+          <a
+            class="release-card"
+            href="https://www.facebook.com/reel/1736492280892338/"
+            data-thumb="rehearsal.png"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="release-art release-art--blue"
+              ><i class="fas fa-wave-square"></i></span
+            ><span class="release-meta">Practice SESSION</span
+            ><strong>Practice Echoes</strong><small>Studio fragments</small
+            ><span class="card-arrow">↗</span>
+          </a>
+          <a
+            class="release-card"
+            href="https://youtu.be/PcnvV5zTCPw?si=5pcP1zEzyXwkEvNL"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="release-art release-art--gold"
+              ><i class="fas fa-headphones"></i></span
+            ><span class="release-meta">LIVE</span
+            ><strong>Live Shows</strong><small>Live session</small
+            ><span class="card-arrow">↗</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="contact-section section-paper" id="contact">
+        <div class="section-index">04 / 04</div>
+        <div class="contact-layout">
+          <div>
+            <p class="kicker">The next scene</p>
+            <h2>Chaos<br /><em>Unleashed.</em></h2>
+          </div>
+          <div class="contact-copy">
+            <p>
+              For live shows, collaborations, film scores, or simply to say
+              hello.
+            </p>
+            <a
+              class="contact-email"
+              href="mailto:thechorusbandkolkata@gmail.com?subject=Hello%20from%20the%20website"
+              aria-label="Email The Chorus at thechorusbandkolkata@gmail.com"
+            >
+              <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+              <span class="contact-email-text"
+                >thechorusbandkolkata@gmail.com</span
+              >
+              <span class="contact-email-arrow" aria-hidden="true">↗</span>
+            </a>
+            <div class="contact-details">
+              <span>Kolkata / India</span><span>Available worldwide</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-brand">The Chorus <span>© Copyright 2026</span></div>
+      <div class="footer-socials">
+        <a
+          href="https://www.instagram.com/thechorusband/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="The Chorus on Instagram"
+          title="Instagram"
+          ><i class="fa-brands fa-instagram" aria-hidden="true"></i
+        ></a>
+        <a
+          href="https://www.facebook.com/thechorusband"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="The Chorus on Facebook"
+          title="Facebook"
+          ><i class="fa-brands fa-facebook-f" aria-hidden="true"></i
+        ></a>
+        <a
+          href="https://www.youtube.com/c/thechorus"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="The Chorus on YouTube"
+          title="YouTube"
+          ><i class="fa-brands fa-youtube" aria-hidden="true"></i
+        ></a>
+        <a
+          href="https://x.com/thechorusband"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="The Chorus on X"
+          title="X"
+          ><i class="fa-brands fa-x-twitter" aria-hidden="true"></i
+        ></a>
+      </div>
+      <a
+        class="footer-credit"
+        href="https://piyal9.github.io/Piyal_Web/"
+        target="_blank"
+        rel="noopener"
+        >All RIght Reserve Piyal Technologies ↗</a
+      >
+    </footer>
+
+    <div class="modal" id="addAnnouncementModal" aria-hidden="true">
+      <div class="modal-panel announcement-modal-panel">
+        <button class="modal-close close-announcement-modal" aria-label="Close">
+          ×
+        </button>
+        <p class="kicker">The rehearsal room</p>
+        <h2>Add announcement</h2>
+        <div class="announcement-form">
+          <label for="announcementDate">Date</label>
+          <input id="announcementDate" type="text" placeholder="12 April 2026" />
+          <label for="announcementDay">Day</label>
+          <input id="announcementDay" type="text" placeholder="Sunday" />
+          <label for="announcementMessage">Message</label>
+          <textarea
+            id="announcementMessage"
+            rows="4"
+            placeholder="Write the announcement..."
+          ></textarea>
+          <button
+            id="saveAnnouncementBtn"
+            class="announcement-save-button"
+            type="button"
+          >
+            Publish announcement
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal"
+      id="passwordGateModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="passwordGateTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-panel announcement-modal-panel password-gate-panel">
+        <button
+          class="modal-close close-password-gate"
+          type="button"
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <p class="kicker">Band members only</p>
+        <h2 id="passwordGateTitle">Enter password</h2>
+        <p class="gate-note">
+          Only band members can post or delete announcements.
+        </p>
+        <form
+          class="announcement-form"
+          id="passwordGateForm"
+          autocomplete="off"
+          novalidate
+        >
+          <label for="passwordGateInput">Password</label>
+          <input
+            id="passwordGateInput"
+            type="password"
+            autocomplete="off"
+            placeholder="Enter password"
+          />
+          <p class="gate-error" id="passwordGateError" role="alert"></p>
+          <button class="announcement-save-button" type="submit">
+            Unlock
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="modal" id="appModal" aria-hidden="true">
+      <div class="modal-panel">
+        <button class="modal-close close-app-modal" aria-label="Close">
+          ×
+        </button>
+        <div id="appModalTitle"></div>
+        <div id="appModalBody"></div>
+      </div>
+    </div>
+    <div id="toast" class="toast" role="status"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
