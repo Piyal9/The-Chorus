@@ -1,6 +1,6 @@
 🛑STRICT LEGAL WARNING: UNAUTHORIZED USE PROHIBITED
 
-#Copyright © 2026 Piyal Tambuli. All rights reserved.
+Copyright © 2026 Piyal Tambuli. All rights reserved.
 
 This repository is published strictly for viewing and portfolio evaluation. Absolutely no license is granted.
 
