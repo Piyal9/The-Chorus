@@ -2128,3 +2128,54 @@ button {
     margin-top: 24px;
   }
 }
+
+/* ===== Contact: email + WhatsApp boxes, stacked and the same width ===== */
+.contact-actions {
+  display: grid;
+  gap: 12px;
+  width: fit-content;
+  max-width: 100%;
+}
+.contact-actions .contact-email-text {
+  flex: 1; /* arrows line up on the right edge of both boxes */
+}
+.contact-whatsapp i {
+  color: #25d366;
+}
+.contact-whatsapp:focus-visible {
+  background: #128c7e;
+  border-color: #128c7e;
+  color: #ffffff;
+}
+@media (hover: hover) {
+  .contact-whatsapp:hover {
+    background: #128c7e;
+    border-color: #128c7e;
+    color: #ffffff;
+  }
+}
+@media (max-width: 800px) {
+  .contact-actions {
+    width: 100%;
+  }
+}
+
+/* ===== Footer credit: plain "All Rights Reserved" + linked "Piyal Technologies" ===== */
+.footer-rights {
+  margin: 0;
+}
+.footer-rights .footer-credit {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 0;
+  transition: color 0.2s ease;
+}
+.footer-rights .footer-credit:hover,
+.footer-rights .footer-credit:focus-visible {
+  color: var(--red);
+}
+@media (max-width: 800px) {
+  .footer-rights {
+    line-height: 1.6;
+  }
+}

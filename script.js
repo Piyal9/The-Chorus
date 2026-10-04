@@ -98,7 +98,7 @@ const bandMembers = [
     { id: 4, name: 'PIYAL', role: 'Bass', photo: 'piyal.png' },
     { id: 5, name: 'RAJA', role: 'Drums', photo: 'raja.png' },
     { id: 6, name: 'NONE', role: 'Lead Vocals', photo: 'fav.png' },
-    { id: 7, name: 'SHAMBHU', role: 'Octapad', photo: 'sambhu.png' },
+    { id: 7, name: 'SHAMBHU', role: 'Octapad', photo: 'shambhu.png' },
     { id: 8, name: 'BISWANATH', role: 'Camera', photo: 'biswa.png' },
     { id: 9, name: 'BABU', role: 'Percussion', photo: 'babu.png' }
 ];
@@ -247,9 +247,9 @@ function renderAnnouncements() {
     `).join('');
 }
 
-// Deleting needs the same password as posting (see PASSWORD GATE below).
+// Deleting ALWAYS asks for the password, even if you unlocked posting a moment ago.
 function deleteAnnouncementById(id) {
-    requireAnnouncementAccess(() => performDeleteAnnouncement(id));
+    requireAnnouncementAccess(() => performDeleteAnnouncement(id), { always: true });
 }
 
 async function performDeleteAnnouncement(id) {
@@ -828,6 +828,7 @@ const GATE_LOCKOUT_MS = 30 * 1000;
 const announcementGate = {
     unlockedUntil: 0,
     pendingAction: null,
+    pendingAlways: false,
     attempts: 0,
     lockedUntil: 0,
     lastFocus: null
@@ -838,12 +839,14 @@ function isAnnouncementUnlocked() {
 }
 
 // Runs `action` straight away if unlocked, otherwise asks for the password first.
-function requireAnnouncementAccess(action) {
-    if (isAnnouncementUnlocked()) {
+// { always: true } ignores the unlock window and asks every single time (used for delete).
+function requireAnnouncementAccess(action, options) {
+    const always = !!(options && options.always);
+    if (!always && isAnnouncementUnlocked()) {
         action();
         return;
     }
-    openPasswordGate(action);
+    openPasswordGate(action, always);
 }
 
 function setGateError(message) {
@@ -851,12 +854,22 @@ function setGateError(message) {
     if (errorEl) errorEl.textContent = message || '';
 }
 
-function openPasswordGate(action) {
+function openPasswordGate(action, always) {
     const modal = document.getElementById('passwordGateModal');
     const input = document.getElementById('passwordGateInput');
     if (!modal || !input) return;
 
     announcementGate.pendingAction = action;
+    announcementGate.pendingAlways = !!always;
+
+    // say what the password is for
+    const note = modal.querySelector('.gate-note');
+    if (note) {
+        if (!note.dataset.defaultText) note.dataset.defaultText = note.textContent.trim();
+        note.textContent = always
+            ? 'Enter the band password to delete this announcement.'
+            : note.dataset.defaultText;
+    }
     announcementGate.lastFocus = document.activeElement;
 
     input.value = '';
@@ -877,6 +890,7 @@ function closePasswordGate(restoreFocus = true) {
     modal.style.display = 'none';
     modal.setAttribute('aria-hidden', 'true');
     announcementGate.pendingAction = null;
+    announcementGate.pendingAlways = false;
 
     if (restoreFocus && announcementGate.lastFocus && announcementGate.lastFocus.focus) {
         announcementGate.lastFocus.focus();
@@ -897,7 +911,10 @@ function submitPasswordGate(e) {
     }
 
     if (input.value.trim() === ANNOUNCEMENT_PASSWORD) {
-        announcementGate.unlockedUntil = now + GATE_UNLOCK_MS;
+        // A delete password does not unlock posting; only the add flow does.
+        if (!announcementGate.pendingAlways) {
+            announcementGate.unlockedUntil = now + GATE_UNLOCK_MS;
+        }
         announcementGate.attempts = 0;
         const action = announcementGate.pendingAction;
         closePasswordGate(false);        // the action usually opens another modal
