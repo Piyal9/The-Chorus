@@ -1232,3 +1232,15 @@ function initHeaderTheme() {
 }
 
 document.addEventListener('DOMContentLoaded', initHeaderTheme);
+
+/* WhatsApp buttons: the number is not in the link, so hovering shows no URL */
+(function () {
+  var phone = ["91", "98045", "92246"].join("");
+  document.querySelectorAll("[data-whatsapp]").forEach(function (el) {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      var text = encodeURIComponent(el.getAttribute("data-whatsapp") || "");
+      window.open("https://wa.me/" + phone + "?text=" + text, "_blank", "noopener");
+    });
+  });
+})();

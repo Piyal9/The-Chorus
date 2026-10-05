@@ -2198,3 +2198,9 @@ button {
   border-color: #d8a84d;
   color: var(--ink);
 }
+
+/* ===== Footer social icons: nudged to the right ===== */
+.footer-socials {
+  position: relative;
+  left: 52px;
+}
