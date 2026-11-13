@@ -96,7 +96,7 @@ const bandMembers = [
     { id: 2, name: 'BIJAY', role: 'Lead Guitar', photo: 'bijay.png' },
     { id: 3, name: 'NONE', role: 'Rhythm Guitar', photo: 'fav.png' },
     { id: 4, name: 'PIYAL', role: 'Bass', photo: 'piyal.png' },
-    { id: 5, name: '', role: 'Drums', photo: 'fav.png' },
+    { id: 5, name: 'RAJA', role: 'Drums', photo: 'raja.png' },
     { id: 6, name: 'NONE', role: 'Lead Vocals', photo: 'fav.png' },
     { id: 7, name: 'SHAMBHU', role: 'Octapad', photo: 'shambhu.png' },
     { id: 8, name: 'BISWANATH', role: 'Camera', photo: 'biswa.png' },
