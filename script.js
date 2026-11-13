@@ -95,9 +95,9 @@ const bandMembers = [
     { id: 1, name: 'PINKU DAS', role: 'Synth', photo: 'pinku.png' },
     { id: 2, name: 'BIJAY', role: 'Lead Guitar', photo: 'bijay.png' },
     { id: 3, name: 'NONE', role: 'Rhythm Guitar', photo: 'fav.png' },
-    { id: 4, name: 'PIYAL', role: 'Bass', photo: 'piyal.png' },
+    { id: 4, name: 'PIYAL', role: 'Bass Guitar', photo: 'piyal.png' },
     { id: 5, name: 'RAJA', role: 'Drums', photo: 'raja.png' },
-    { id: 6, name: 'NONE', role: 'Lead Vocals', photo: 'fav.png' },
+    { id: 6, name: 'BIBHAS', role: 'Lead Vocals', photo: 'bibhas.png' },
     { id: 7, name: 'SHAMBHU', role: 'Octapad', photo: 'shambhu.png' },
     { id: 8, name: 'BISWANATH', role: 'Visual Director', photo: 'biswa.png' },
     { id: 9, name: 'BABU', role: 'Percussion', photo: 'babu.png' }
