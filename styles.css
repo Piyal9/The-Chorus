@@ -2204,3 +2204,55 @@ button {
   position: relative;
   left: 52px;
 }
+
+/* ==========================================================================
+   HERO FIX: show the full banner at its natural 1600x595 ratio.
+   No stretching on laptop, no cropping on mobile. Text sits below the image.
+   Keep this block at the very END of the file so it overrides earlier rules.
+   ========================================================================== */
+.hero-scene {
+  height: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #08090d;
+  background-image: none;
+  padding-bottom: 72px;
+}
+.hero-scene::before {
+  content: "";
+  display: block;
+  width: 100%;
+  aspect-ratio: 1600 / 595; /* same ratio as Herolanding.png */
+  background: var(--hero-image) center / 100% 100% no-repeat;
+}
+.hero-scene::after {
+  display: none; /* remove the mobile dark overlay */
+}
+.hero-copy {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: min(780px, calc(100% - 10vw));
+  margin: 56px 0 0 5vw;
+}
+.hero-caption {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  margin: 48px 0 0 5vw;
+}
+
+@media (max-width: 800px) {
+  .hero-scene {
+    padding-top: 64px; /* clear the fixed mobile header */
+    padding-bottom: 56px;
+  }
+  .hero-copy {
+    width: calc(100% - 40px);
+    margin: 32px 0 0 20px;
+  }
+  .hero-caption {
+    margin: 36px 0 0 20px;
+  }
+}
